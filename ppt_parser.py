@@ -1,6 +1,9 @@
 """PPT/PPTX text extraction using python-pptx."""
 
+import hashlib
 import io
+
+import streamlit as st
 from pptx import Presentation
 from pptx.enum.shapes import PP_PLACEHOLDER
 
@@ -116,6 +119,22 @@ def extract_ppt_text(file) -> dict:
         "slides": slides,
         "full_text": full_text,
     }
+
+
+def file_hash(data: bytes) -> str:
+    """Return the SHA-256 hex digest of *data* — used as a cache key."""
+    return hashlib.sha256(data).hexdigest()
+
+
+@st.cache_data(show_spinner=False)
+def extract_ppt_text_cached(file_bytes: bytes) -> dict:
+    """
+    Cached version of extract_ppt_text.
+
+    Streamlit caches by the value of *file_bytes*; identical files skip
+    re-parsing entirely.  Exceptions propagate to the caller unchanged.
+    """
+    return extract_ppt_text(file_bytes)
 
 
 def validate_pptx(file_bytes: bytes) -> tuple[bool, str]:
