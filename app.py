@@ -2199,17 +2199,14 @@ def _render_timer_fragment() -> None:
     if remaining_s == 0:
         question = quiz.questions[idx]
 
-        if idx == quiz.total_questions - 1 and st.session_state.show_submit_warning:
-            return
-
         if question.number not in st.session_state.user_answers:
             _mark_question_unanswered(question.number)
 
         if idx < quiz.total_questions - 1:
             _set_question_idx(idx + 1)
-            st.rerun()
-
-        _attempt_submit()
+            st.rerun(scope="app")
+        else:
+            _attempt_submit(force=True)
 
 
 def _submit_quiz() -> None:
